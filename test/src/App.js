@@ -11,7 +11,7 @@ class App extends React.Component {
 
 		let data ;
 
-		axios.get('http://localhost:8000/wel/')
+		axios.get('http://localhost:8000/abcd/india')
 		.then(res => {
 			data = res.data;
 			this.setState({
