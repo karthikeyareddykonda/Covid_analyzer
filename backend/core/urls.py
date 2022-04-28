@@ -3,6 +3,6 @@ from .views import *
 from django.conf.urls import url
 
 urlpatterns = [
-    path('abcd/<int:id>', AbcdView.as_view(), name="abcd name"),
-    # url(r'^abcd/(?P<ss>[a-z.@_0-9]+)$', AbcdView.as_view()),
+    path('abcd/<str:id>', AbcdView.as_view(), name="abcd name"),
+    path('country/<str:country>/type/<str:type>/variant/<str:variant>/start/<str:start>/end/<str:end>', DetailView.as_view()), 
 ]
