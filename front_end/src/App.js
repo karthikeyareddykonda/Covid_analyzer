@@ -3,6 +3,7 @@ import Country_info from './Country/Country_info';
 import World_info from './World/World_info';
 import Stats_info from './Stats/Stats_info';
 import Country_status from './Country/Country_status';
+import Playground from './Playground/Playground';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import {
@@ -37,6 +38,10 @@ function App() {
 
         <Link to = "/Stats" > Stats</Link>
         </li>
+
+        <li>
+          <Link to = "/Playground" > Playground </Link>
+        </li>
       </ul>
 
       <Routes>
@@ -45,6 +50,7 @@ function App() {
         <Route path = "/World" element= {<World_info /> } ></Route>
         <Route path = "/Stats" element= {<Stats_info /> } ></Route>
         <Route path = "/Country/status" element = {< Country_status />}></Route>
+        <Route path = "/Playground" element = {< Playground /> }></Route>
 
       </Routes>
 
