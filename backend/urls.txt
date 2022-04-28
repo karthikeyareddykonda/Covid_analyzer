@@ -1,0 +1,11 @@
+'abcd/<int:id>',
+
+
+
+'country/<string:id>/type/<string:id>/variant/<string:id>/vaccine/<string:id>/start/<string:id>/end/<string:id>'
+'country/<string:id>/summary'
+
+
+
+
+'world/type/<string:id>/variant/<string:id>/vaccine/<string:id>/start/<string:id>/end/<string:id>'
