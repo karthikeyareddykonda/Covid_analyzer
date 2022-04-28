@@ -2,6 +2,7 @@ import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import makeAnimated from "react-select/animated";
 import { default as ReactSelect } from "react-select";
+import { DateRangePicker } from 'react-date-range';
 import { components } from "react-select";
 import {
     BrowserRouter as Router ,
@@ -19,6 +20,13 @@ import {
     { value: 4, label: "Country 4" },
     { value: 5, label: "Country 5" }
   ];
+
+  const statOptions = [
+    { value : 1 , label : "Deaths" },
+    { value : 2, label : "Active cases"}
+    
+
+  ]
 
   const Option = (props) => {
     return (
@@ -44,7 +52,9 @@ class Stats_info extends React.Component{
 
         this.state = {
             name : "India",
-            optionSelected: null
+            Country_Selected: null,
+            Stat_options : null
+
         }
 
         console.log("This is stats constructor") ;
@@ -53,12 +63,28 @@ class Stats_info extends React.Component{
 
     handleChange = selected => {
         this.setState({
-          optionSelected: selected
+          Country_Selected: selected
         });
 
         console.log(this.state.optionSelected) ;
         console.log(selected) ;
       };
+
+    handleChange2 = selected => {
+      this.setState({
+
+        Stat_options : selected
+
+
+      })
+      console.log(selected) ;
+    }
+
+    handleSelect(date){
+      console.log(date); // native Date object
+    
+    
+  }
 
     componentDidMount(){
 
@@ -67,7 +93,11 @@ class Stats_info extends React.Component{
     }
 
     render(){
-
+      const selectionRange = {
+        startDate: new Date(),
+        endDate: new Date(),
+        key: 'selection',
+      }
 
         return(
 
@@ -76,7 +106,7 @@ class Stats_info extends React.Component{
             
             
                 <h1> Stats page </h1>
-
+                <p>Select Countries</p>
                 <span
         class="d-inline-block"
         data-toggle="popover"
@@ -96,6 +126,34 @@ class Stats_info extends React.Component{
           value={this.state.optionSelected}
         />
       </span>
+
+          <br></br>
+          <p>Select Statistic</p>
+      <span
+        class="d-inline-block"
+        data-toggle="popover"
+        data-trigger="focus"
+        data-content="Please selecet account(s)"
+      >
+        <ReactSelect
+          options={statOptions}
+         
+          closeMenuOnSelect={false}
+          hideSelectedOptions={false}
+          components={{
+            Option
+          }}
+          onChange={this.handleChange2}
+        
+          value={this.state.Stat_options}
+        />
+      </span>
+
+      <p> Select the date range </p>
+      <DateRangePicker
+        ranges={[selectionRange]}
+        onChange={this.handleSelect}
+      />
             
             
             

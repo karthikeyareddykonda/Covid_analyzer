@@ -4,6 +4,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRangePicker } from 'react-date-range';
+import { components } from "react-select";
+import { default as ReactSelect } from "react-select";
 import {
     BrowserRouter as Router ,
     Routes,
@@ -13,6 +15,27 @@ import {
   
   } from 'react-router-dom' ;
 
+  const statOptions = [
+    { value : 1 , label : "Deaths" },
+    { value : 2, label : "Active cases"}
+    
+
+  ]
+
+  const Option = (props) => {
+    return (
+      <div>
+        <components.Option {...props}>
+          <input
+            type="checkbox"
+            checked={props.isSelected}
+            onChange={() => null}
+          />{" "}
+          <label>{props.label}</label>
+        </components.Option>
+      </div>
+    );
+  };
 
 class World_info extends React.Component{
 
@@ -21,7 +44,8 @@ class World_info extends React.Component{
         super(props); 
 
         this.state = {
-            name : "India"
+            name : "India",
+            Stat_options : null
         }
 
         console.log("This is world constructor") ;
@@ -39,7 +63,18 @@ class World_info extends React.Component{
             { country: "mx", value: 127318112 }, // mexico
           ];
 
+        this.setcolor = this.setcolor.bind(this) ;
+
     }
+    handleChange2 = selected => {
+        this.setState({
+  
+          Stat_options : selected
+  
+  
+        })
+        console.log(selected) ;
+      }
 
     componentDidMount(){
 
@@ -53,6 +88,32 @@ class World_info extends React.Component{
       
     }
 
+    setcolor(props){
+
+        console.log("entere");
+        console.log(props) ;
+        var maxc = 0;
+        for(var i = 0; i< props.data.length; i++){
+
+            maxc = Math.max(maxc,props.data[i].value);
+
+            
+        } 
+        console.log(this.data);
+        for(var i = 0; i< props.data.length; i++){
+          this.data[i].value = this.data[i].value/maxc ;
+          
+        }
+        
+        console.log(this.data);
+
+
+      
+        
+
+
+    }
+
     render(){
 
         const selectionRange = {
@@ -64,7 +125,12 @@ class World_info extends React.Component{
 
         return(
 
+            
+
             <>
+            {< this.setcolor data = {this.data} />}
+
+            
             
             
             
@@ -78,6 +144,28 @@ class World_info extends React.Component{
                     size="responsive"
                     data={this.data}
                 />
+
+            <p>Select Statistic</p>
+                <span
+                    class="d-inline-block"
+                    data-toggle="popover"
+                    data-trigger="focus"
+                    data-content="Please selecet account(s)"
+                >
+                    <ReactSelect
+                    options={statOptions}
+                    
+                    closeMenuOnSelect={false}
+                    hideSelectedOptions={false}
+                    components={{
+                        Option
+                    }}
+                    onChange={this.handleChange2}
+                    
+                    value={this.state.Stat_options}
+                    />
+                </span>
+                <br></br>
 
                 <DateRangePicker
                     ranges={[selectionRange]}

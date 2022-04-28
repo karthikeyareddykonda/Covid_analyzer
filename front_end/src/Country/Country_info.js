@@ -27,6 +27,34 @@ class Country_info extends React.Component{
 
     componentDidMount(){
 
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: 'React POST Request Example' })
+        };
+
+        /*
+        fetch(`http://localhost:8000/wel/`)
+        .then((Response) => Response.json())
+        .then((json) => {
+
+            
+           
+            console.log('fetch 1 called');
+            //console.log("scorecard print",json[0])
+        })
+        */
+
+        
+        fetch('http://localhost:8000/abcd/5')
+        .then((Response) => Response.json())
+        .then((json) => {
+
+            
+           
+            console.log('fetch 2 called');
+            //console.log("scorecard print",json[0])
+        })
         // do nothing as of now 
 
     }
