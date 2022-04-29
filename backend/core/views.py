@@ -91,11 +91,19 @@ class DetailView(APIView):
         with InfluxDBClient(url="http://127.0.0.1:8086", token=token, org=org) as client:
             query_api=client.query_api()
             for c in coun:
-                print(c)
-                query='from(bucket: "bucket")\
-                    |> range(start:{},stop:{})\
-                    |> filter(fn:(r)=>r._measurement=="CovidStats")\
-                    |> filter(fn:(r)=>r.country=="{}" and r.variant=="{}" and r._field=="{}")'.format(start,end,c,variant,type)
+                if(variant=="all"):
+                    query='from(bucket: "bucket")\
+                        |> range(start: {}, stop: {})\
+                        |> filter(fn: (r) => r["_measurement"] == "CovidStats")\
+                        |> filter(fn: (r) => r["_field"] == "{}")\
+                        |> filter(fn :(r) => r["country"] == "{}")\
+                        |> group(columns: ["_measurement","country","_time"])\
+                        |> sum(column: "_value")'.format(start,end,type,c)
+                else:
+                        query='from(bucket: "bucket")\
+                        |> range(start:{},stop:{})\
+                        |> filter(fn:(r)=>r._measurement=="CovidStats")\
+                        |> filter(fn:(r)=>r.country=="{}" and r.variant=="{}" and r._field=="{}")'.format(start,end,c,variant,type)
                 res=query_api.query(org=org,query=query)
                 results = []
                 for table in res:
@@ -107,7 +115,6 @@ class DetailView(APIView):
 
 class MapView(APIView):
     def get(self,request,start):
-        print("helooooooooooooooooooo")
         with InfluxDBClient(url='http://127.0.0.1:8086',token=token,org=org) as client:
             query_api=client.query_api()
             start=start[1:]
@@ -123,6 +130,104 @@ class MapView(APIView):
             for table in res:
                 for record in  table.records:
                     results.append([record.values.get("country"),record.get_value()])
+    
         obj=json.dumps(results)
         return Response(obj)
 
+class PieChar(APIView):
+    def get(self,request):
+        with InfluxDBClient(url='http://127.0.0.1:8086',token=token,org=org) as client:
+            query_api=client.query_api()
+            query='from(bucket: "bucket")\
+                |> range(start: 2002-04-10T18:30:00.000Z, stop: 2052-04-10T18:30:00.000Z)\
+                |> filter(fn: (r) => r["_measurement"] == "CovidStats")\
+                |> filter(fn: (r) => r["_field"] == "new_cases")\
+                |> group(columns: ["_measurement","variant"])\
+                |> sum(column: "_value")'
+            res=query_api.query(org=org,query=query)
+            temp=[]
+            for table in res:
+                for record in  table.records:
+                    temp.append([record.values.get("variant"),record.get_value()])
+            query='from(bucket: "bucket")\
+                |> range(start: 2022-03-24T23:47:16.854775806Z, stop: 2052-04-10T18:30:00.000Z)\
+                |> filter(fn: (r) => r["_measurement"] == "CovidStats")\
+                |> filter(fn: (r) => r["_field"] == "new_cases")\
+                |> group(columns: ["_measurement"])\
+                |> sum(column: "_value")'
+            res=query_api.query(org=org,query=query)
+            for table in res:
+                for record in  table.records:
+                    temp1=record.get_value()
+            query='from(bucket: "bucket")\
+                |> range(start: 2022-03-24T23:47:16.854775806Z, stop: 2052-04-10T18:30:00.000Z)\
+                |> filter(fn: (r) => r["_measurement"] == "CovidStats")\
+                |> filter(fn: (r) => r["_field"] == "new_deaths")\
+                |> group(columns: ["_measurement"])\
+                |> sum(column: "_value")'
+            res=query_api.query(org=org,query=query)
+            for table in res:
+                for record in  table.records:
+                    temp2=record.get_value()
+            r=[temp,temp1,temp2]
+        obj=json.dumps(r)
+        return Response(obj)
+
+
+class CountrySumView(APIView):
+    def get(self,request,country):
+        with InfluxDBClient(url='http://127.0.0.1:8086',token=token,org=org) as client:
+            result=dict()
+            query_api=client.query_api()
+            for i in ["oxygen cylinder","Ventilators","Mask"]:
+                query='from (bucket:"bucket")\
+                    |> range(start:2022-04-01T01:01:01Z , stop:2022-09-01T01:01:01Z)\
+                    |> filter(fn: (r) => r["_measurement"] == "Medic")\
+                    |> filter(fn: (r) => r["country"]=="{}")\
+                    |> filter(fn: (r) => r["equipment"] == "{}")\
+                    |> filter(fn: (r) => r["_field"] == "demand")'.format(country,i)
+                res=query_api.query(org=org,query=query)    
+                for table in res:
+                    for record in  table.records:
+                        temp1=record.get_value()
+                query='from (bucket:"bucket")\
+                    |> range(start:2022-04-01T01:01:01Z , stop:2022-09-01T01:01:01Z)\
+                    |> filter(fn: (r) => r["_measurement"] == "Medic")\
+                    |> filter(fn: (r) => r["country"]=="{}")\
+                    |> filter(fn: (r) => r["equipment"] == "{}")\
+                    |> filter(fn: (r) => r["_field"] == "supply")'.format(country,i)
+                res=query_api.query(org=org,query=query)    
+                for table in res:
+                    for record in  table.records:
+                        temp2=record.get_value()
+                result[i]=[temp1,temp2]
+            query='from(bucket: "bucket")\
+            |> range(start: 2002-04-10T18:30:00.000Z, stop: 2052-04-10T18:30:00.000Z)\
+            |> filter(fn: (r) => r["_measurement"] == "CovidStats")\
+            |> filter(fn: (r) => r["_field"] == "new_deaths")\
+            |> filter(fn: (r) => r["country"] == "{}")\
+            |> group(columns: ["_measurement" ,"country", "_field"])\
+            |>sum()'.format(country)
+            res=query_api.query(org=org,query=query)    
+            for table in res:
+                for record in  table.records:
+                    temp2=record.get_value()
+            result["total_deaths"]=temp2
+            query='from(bucket: "bucket")\
+                |> range(start: 2002-04-10T18:30:00.000Z, stop: 2052-04-10T18:30:00.000Z)\
+                |> filter(fn: (r) => r["_measurement"] == "CovidStats")\
+                |> filter(fn: (r) => r["country"] == "{}")\
+                |> filter(fn: (r) => r["_field"] == "new_cases")\
+                |> group(columns: ["_measurement" ,"country", "_field"])\
+                |>sum()'.format(country)
+            res=query_api.query(org=org,query=query)
+            for table in res:
+                for record in  table.records:
+                    temp2=record.get_value()
+            result["total_cases"]=temp2
+            obj=json.dumps(result)
+            return Response(obj)
+                    
+            
+            
+            
