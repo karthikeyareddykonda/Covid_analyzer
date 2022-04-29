@@ -20,5 +20,6 @@ from core.views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('abcd/<str:id>', AbcdView.as_view(), name="abcd name"),
-    path('country/<str:country>/type/<str:type>/variant/<str:variant>/start/<str:start>/end/<str:end>', DetailView.as_view()), 
+    path('country/<str:country>/type/<str:type>/variant/<str:variant>/start/<str:start>/end/<str:end>', DetailView.as_view()),
+    path('map/<str:start>',MapView.as_view()) 
 ]
