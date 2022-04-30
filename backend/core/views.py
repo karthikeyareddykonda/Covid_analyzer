@@ -17,7 +17,7 @@ from django.shortcuts import  render, redirect
 from .forms import NewUserForm
 from django.contrib.auth.forms import AuthenticationForm 
 from django.contrib.auth import login, authenticate
-token = "ioka1J8wcPhq5aWk8sC9OvZNOb7Jzf7LEgDQlAk7W1Zrm9bwm_0pQMzrur8igXPk42XDlE5T4QXMDNpGlgEQFA=="
+token = "W4ss50DPEs72tw-DmwTbs17HiwEr2Ywfc7Q8PmXY5b0xBu-gB3qmCf5rzexHDLf8duoDNycZLX5fb5lgqNC9Pg=="
 org = "dblab"
 bucket = "bucket"
 # Create your views here.
@@ -171,6 +171,7 @@ class PieChar(APIView):
                     temp2=record.get_value()
             r=[temp,temp1,temp2]
         obj=json.dumps(r)
+        print(r)
         return Response(obj)
 
 
@@ -181,17 +182,19 @@ class CountrySumView(APIView):
             query_api=client.query_api()
             for i in ["oxygen cylinder","Ventilators","Mask"]:
                 query='from (bucket:"bucket")\
-                    |> range(start:2022-04-01T01:01:01Z , stop:2022-09-01T01:01:01Z)\
+                    |> range(start:2022-03-01T01:01:01Z , stop:2032-09-01T01:01:01Z)\
                     |> filter(fn: (r) => r["_measurement"] == "Medic")\
                     |> filter(fn: (r) => r["country"]=="{}")\
                     |> filter(fn: (r) => r["equipment"] == "{}")\
                     |> filter(fn: (r) => r["_field"] == "demand")'.format(country,i)
                 res=query_api.query(org=org,query=query)    
                 for table in res:
+                    print("hiiiiiii")
                     for record in  table.records:
                         temp1=record.get_value()
+                print(temp1)
                 query='from (bucket:"bucket")\
-                    |> range(start:2022-04-01T01:01:01Z , stop:2022-09-01T01:01:01Z)\
+                    |> range(start:2022-03-01T01:01:01Z , stop:2032-09-01T01:01:01Z)\
                     |> filter(fn: (r) => r["_measurement"] == "Medic")\
                     |> filter(fn: (r) => r["country"]=="{}")\
                     |> filter(fn: (r) => r["equipment"] == "{}")\
